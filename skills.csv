@@ -1,0 +1,35 @@
+No.,Code,Difficulty Level,Skill,Example
+1,1A,1,1-digit addition - no carry,2+2
+2,1S,1,1-digit subtraction - no borrow,9-5
+3,T5,1,Multiplication tables - up to 5,3x4=?
+4,2A1,1,2+1 digit addition - no carry,11+5
+5,2A2,1,2+2 digit addition - no carry,11+22
+6,2S1,1,2-1 digit subtraction - no borrow,19-4
+7,1AC,2,1-digit addition - carry,9+4
+8,2A1C,2,2-digit addition - carry,17+9
+9,2A2C,2,2+2 digit addition - double carry,96+89
+10,2S1B,2,2-1 digit subtraction - borrow,14-9
+11,2S2,2,2-2 digit subtraction - no borrow,19-14
+12,T10,2,Multiplication tables - 5 to 10,9x7=?
+13,3A,2,3-digit addition - no carry,123+321
+14,3AC,2,3-digit addition - single carry,369+12
+15,3S,2,3-digit subtraction - no borrow,999-888
+16,2S1B,3,2-1 digit subtraction - borrow,14-9
+17,2S2B,3,2-2 digit subtraction - borrow,32-19
+18,3AC2,3,3-digit addition - double carry,369+243
+19,3SB,3,3-digit subtraction - single borrow,991-222
+20,3SB2,3,3-digit subtraction - double borrow,901-222
+21,2M1,3,2x1 multiplication - no carry,14x3=?
+22,3M1,3,3x1 multiplication - no carry,123x2=?
+23,2M1C,4,2x1 multiplication - carry,12x9=?
+24,3M1C,4,3x1 multiplication - single carry,246x2=?
+25,3M1C2,5,3x1 multiplication - double carry,246x4=?
+26,2M2,5,"2x2 multiplication - no carry (multiplication part should not have carry)",31x12=?
+27,2D1,5,2/1 division without remainder,81/3=?
+28,3D1,5,3/1 division without remainder,123/3=?
+29,2M2C,6,2x2 multiplication - carry,69x69=?
+30,2D1R,6,2/1 division with remainder,70/4=?
+31,3D1R,6,3/1 division with remainder,123/5=?
+32,3M2C,7,3x2 multiplication - carry,479x34=?
+33,3D1Z,7,3/1 division with 0 in quotient,601/5=?
+34,4D1R,7,4/1 division with remainder,1001/6=?
