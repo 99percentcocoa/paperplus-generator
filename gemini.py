@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import csv
 import json
+import random
 from google import genai
 from google.genai import types
 import numpy as np
@@ -196,6 +197,29 @@ if __name__ == "__main__":
     # for res in batch_results:
     #     print(f"Distractors: {res['distractors']}")
 
-    for i, res in enumerate(batch_results):
-        q = worksheet_questions[i]
-        print(f"Q: {q['question']} | Ans: {q['correct_ans']} | Distractors: {res['distractors']}")
+    worksheet_template = []
+    worksheet_template_questions = []
+    ans_key = []
+    for i, q in enumerate(worksheet_questions):
+        correct_index = random.randint(0, 3)
+        # Retrieve distractors from batch_results and create options list
+        distractors = batch_results[i]['distractors']
+        options = list(distractors)
+        options.insert(correct_index, q['correct_ans'])
+        options = [str(opt) for opt in options]
+
+        ans_key.append(chr(65 + correct_index))  # A, B, C, D
+        worksheet_template_questions.append({
+            "question_text": q['question'],
+            "options": options,
+            "correct_option": str(correct_index + 1)
+        })
+    worksheet_template.append({'answerKey': ans_key})
+    worksheet_template.append(worksheet_template_questions)
+
+    print(worksheet_template)
+
+    
+    # for i, res in enumerate(batch_results):
+    #     q = worksheet_questions[i]
+    #     print(f"Q: {q['question']} | Ans: {q['correct_ans']} | Distractors: {res['distractors']}")
