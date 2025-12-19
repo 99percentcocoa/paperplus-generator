@@ -3,13 +3,13 @@ import os
 import csv
 import json
 import random
+import io
 from google import genai
 from google.genai import types
 import numpy as np
 import generate
 
 load_dotenv()
-csv_file = csv.reader(open('skills.csv', 'r'), delimiter=',')
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 print(GEMINI_API_KEY)
@@ -21,6 +21,8 @@ def lookup_skill_misconceptions(skill_code: str) -> tuple[str, str]:
     Args:
         skill_code (str): The skill code to look up.
     """
+    csv_file = csv.reader(open('skills.csv', 'r'), delimiter=',')
+    next(csv_file)  # skip header
     skill = ""
     misconceptions = ""
     for row in csv_file:
@@ -181,6 +183,58 @@ def get_questions(skill_id: str, num_questions: int) -> list[dict]:
             "misconceptions": misconceptions
         })
     return questions
+
+# generate worksheets from natural language query
+def get_template_from_query(query: str) -> list[dict]:
+
+    with open('skills.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    system_prompt = f"""You are a Teacher's Assistant AI that converts a teacher's natural-language request into a 20-question worksheet template by returning a compact mapping of skill codes to integer question counts.
+    Always return only a mapping in the exact format: {{skill_code: num_questions}} (e.g. {{1A: 5, T5: 8, 2A1: 7}}).
+    The values must be non-negative integers and the values must sum to exactly 20.
+    Allocate questions by difficulty and user intent:
+    If the user explicitly asks to "focus on" or "practice" specific skills, prioritize those (give them a higher share of the 20 questions) while still returning a total of 20.
+    Otherwise, allocate proportionally across relevant skills using the difficulty information (see "Allocation algorithm" below).
+    Prefer variety but keep coherence: avoid putting every question on the exact same skill unless the user clearly asks for intense practice on one skill. Try to include multiple related skills where the user's request is broad (e.g., "basic addition practice").
+    
+    Use the following JSON table for skills and difficulties: {json.dumps(data)}"""
+
+    prompt_text = f"Convert the following teacher request into a mapping of skill codes to integer question counts: {query}"
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    skill_codes = [skill['code'] for skill in data]
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[prompt_text],
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema={
+                "type": "object",
+                "properties": {
+                    "skills": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "skill_code": {"type": "string", "enum": skill_codes},
+                                "num_questions": {"type": "integer", "minimum": 0}
+                            }
+                        }
+                    }
+                }
+            },
+            temperature=0.7,
+            system_instruction=system_prompt
+        )
+    )
+
+    print(response.text)
+    result = json.loads(response.text)
+
+    return result
 
 if __name__ == "__main__":
 

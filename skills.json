@@ -1,0 +1,240 @@
+[
+  {
+    "code": "1A",
+    "name": "1-digit addition - no carry",
+    "difficulty": 1,
+    "example": "2+2",
+    "misconceptions": "make an off-by-one error"
+  },
+  {
+    "code": "1S",
+    "name": "1-digit subtraction - no borrow",
+    "difficulty": 1,
+    "example": "9-5",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting"
+  },
+  {
+    "code": "T5",
+    "name": "Multiplication tables - up to 5",
+    "difficulty": 1,
+    "example": "3x4=?",
+    "misconceptions": "confuse one table with another"
+  },
+  {
+    "code": "2A1",
+    "name": "2+1 digit addition - no carry",
+    "difficulty": 1,
+    "example": "11+5",
+    "misconceptions": "make an off-by-one error, \nadd the second number at the wrong place value"
+  },
+  {
+    "code": "2A2",
+    "name": "2+2 digit addition - no carry",
+    "difficulty": 1,
+    "example": "11+22",
+    "misconceptions": "make an off-by-one error, \nadd the second number at the wrong place value"
+  },
+  {
+    "code": "2S1",
+    "name": "2-1 digit subtraction - no borrow",
+    "difficulty": 1,
+    "example": "19-4",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "1AC",
+    "name": "1-digit addition - carry",
+    "difficulty": 2,
+    "example": "9+4",
+    "misconceptions": "make an off-by-one error,\nforget to add the carry"
+  },
+  {
+    "code": "2A1C",
+    "name": "2-digit addition - carry",
+    "difficulty": 2,
+    "example": "17+9",
+    "misconceptions": "make an off-by-one error,\nforget to add the carry,\nadd the second number at the wrong place value"
+  },
+  {
+    "code": "2A2C",
+    "name": "2+2 digit addition - double carry",
+    "difficulty": 2,
+    "example": "96+89",
+    "misconceptions": "make an off-by-one error,\nforget to add one of the carries,\nadd the second number at the wrong place value"
+  },
+  {
+    "code": "2S1B",
+    "name": "2-1 digit subtraction - borrow",
+    "difficulty": 2,
+    "example": "14-9",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting\nforget to add one of the carries,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "2S2",
+    "name": "2-2 digit subtraction - no borrow",
+    "difficulty": 2,
+    "example": "19-14",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "T10",
+    "name": "Multiplication tables - 5 to 10",
+    "difficulty": 2,
+    "example": "9x7=?",
+    "misconceptions": "confuse one table with another"
+  },
+  {
+    "code": "3A",
+    "name": "3-digit addition - no carry",
+    "difficulty": 2,
+    "example": "123+321",
+    "misconceptions": "make an off-by-one error, \nadd the second number at the wrong place value"
+  },
+  {
+    "code": "3AC",
+    "name": "3-digit addition - single carry",
+    "difficulty": 2,
+    "example": "369+12",
+    "misconceptions": "make an off-by-one error,\nforget to add the carry,\nadd the second number at the wrong place value"
+  },
+  {
+    "code": "3S",
+    "name": "3-digit subtraction - no borrow",
+    "difficulty": 2,
+    "example": "999-888",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "2S1B",
+    "name": "2-1 digit subtraction - borrow",
+    "difficulty": 3,
+    "example": "14-9",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting\nforget to add one of the carries,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "2S2B",
+    "name": "2-2 digit subtraction - borrow",
+    "difficulty": 3,
+    "example": "32-19",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting\nforget to add one of the carries,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "3AC2",
+    "name": "3-digit addition - double carry",
+    "difficulty": 3,
+    "example": "369+243",
+    "misconceptions": "make an off-by-one error,\nforget to add one of the carries,\nadd the second number at the wrong place value"
+  },
+  {
+    "code": "3SB",
+    "name": "3-digit subtraction - single borrow",
+    "difficulty": 3,
+    "example": "991-222",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting\nforget to add one of the carries,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "3SB2",
+    "name": "3-digit subtraction - double borrow",
+    "difficulty": 3,
+    "example": "901-222",
+    "misconceptions": "make an off-by-one error,\nadding instead of subtracting\nforget to add one of the carries,\nsubtract the second number at the wrong place value"
+  },
+  {
+    "code": "2M1",
+    "name": "2x1 multiplication - no carry",
+    "difficulty": 3,
+    "example": "14x3=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply"
+  },
+  {
+    "code": "3M1",
+    "name": "3x1 multiplication - no carry",
+    "difficulty": 3,
+    "example": "123x2=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply"
+  },
+  {
+    "code": "2M1C",
+    "name": "2x1 multiplication - carry",
+    "difficulty": 4,
+    "example": "12x9=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply,\nforget to add one of the carries"
+  },
+  {
+    "code": "3M1C",
+    "name": "3x1 multiplication - single carry",
+    "difficulty": 4,
+    "example": "246x2=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply,\nforget to add one of the carries"
+  },
+  {
+    "code": "3M1C2",
+    "name": "3x1 multiplication - double carry",
+    "difficulty": 5,
+    "example": "246x4=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply,\nforget to add one of the carries,\nmultiply the second number at the wrong place value"
+  },
+  {
+    "code": "2M2",
+    "name": "2x2 multiplication - no carry\n(multiplication part should not have carry)",
+    "difficulty": 5,
+    "example": "31x12=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply,\nforget to multiply the other place values,\nforget to add carries during addition"
+  },
+  {
+    "code": "2D1",
+    "name": "2/1 division without remainder",
+    "difficulty": 5,
+    "example": "81/3=?",
+    "misconceptions": "make an off-by-one error,\nmake mistakes while adding or subtracting during division"
+  },
+  {
+    "code": "3D1",
+    "name": "3/1 division without remainder",
+    "difficulty": 5,
+    "example": "123/3=?",
+    "misconceptions": "make an off-by-one error,\nmake mistakes while adding or subtracting during division"
+  },
+  {
+    "code": "2M2C",
+    "name": "2x2 multiplication - carry",
+    "difficulty": 6,
+    "example": "69x69=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply,\nforget to add one of the carries,\nmultiply the second number at the wrong place value"
+  },
+  {
+    "code": "2D1R",
+    "name": "2/1 division with remainder",
+    "difficulty": 6,
+    "example": "70/4=?",
+    "misconceptions": "make an off-by-one error,\nmake mistakes while adding or subtracting during division"
+  },
+  {
+    "code": "3D1R",
+    "name": "3/1 division with remainder",
+    "difficulty": 6,
+    "example": "123/5=?",
+    "misconceptions": "make an off-by-one error,\nmake mistakes while adding or subtracting during division"
+  },
+  {
+    "code": "3M2C",
+    "name": "3x2 multiplication - carry",
+    "difficulty": 7,
+    "example": "479x34=?",
+    "misconceptions": "make an off-by-one error,\nadd instead of multiply,\nforget to add one of the carries,\nmultiply the second number at the wrong place value"
+  },
+  {
+    "code": "3D1Z",
+    "name": "3/1 division with 0 in quotient",
+    "difficulty": 7,
+    "example": "601/5=?",
+    "misconceptions": "make an off-by-one error,\nmake mistakes while adding or subtracting during division,\nforget to account for the 0 in the quotient"
+  },
+  {
+    "code": "4D1R",
+    "name": "4/1 division with remainder",
+    "difficulty": 7,
+    "example": "1001/6=?",
+    "misconceptions": "make an off-by-one error,\nmake mistakes while adding or subtracting during division"
+  }
+]
