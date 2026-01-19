@@ -98,23 +98,17 @@ def worksheet_to_json(worksheet: list) -> dict:
     
     for i, q in enumerate(worksheet):
         questions.append({
-            "number": i + 1,
-            "question": q.question_text,
+            "question_text": q.question_text,
             "skill_code": q.skill_code,
             "options": [str(opt) for opt in q.options],
-            "correct_answer_index": q.answer - 1,  # 0-based index
+            "correct_option": q.answer - 1,  # 0-based index
             "possible_distractors": [str(d) for d in q.possible_distractors]
         })
-        answer_key.append({
-            "question_number": i + 1,
-            "correct_option": chr(65 + q.answer - 1),  # A, B, C, D
-            "correct_answer": q.options[q.answer - 1]
-        })
+        answer_key.append(chr(65 + q.answer - 1))
     
     return {
         "worksheet": questions,
-        "answer_key": answer_key,
-        "total_questions": len(worksheet)
+        "answer_key": answer_key
     }
 
 
