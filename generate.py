@@ -13,6 +13,7 @@ class Question:
     skill_code: str
     options: list
     answer: int  # 1-4 index indicating the correct answer position
+    correct_option: str = None # will be filled in choose_distractors
     possible_distractors: list
 
     def choose_distractors(self) -> list:
@@ -46,6 +47,8 @@ class Question:
         self.answer = new_answer_position
         
         return all_options
+    
+    def get_marathi(self)
 
 def _rand_digit(exclude_zero=False):
     if exclude_zero:
