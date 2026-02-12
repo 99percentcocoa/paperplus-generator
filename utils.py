@@ -1,3 +1,65 @@
+import json
+from pathlib import Path
+
+# Cache for skills data
+_skills_cache = None
+
+
+def _load_skills():
+    """Load skills data from skills.json file."""
+    global _skills_cache
+    if _skills_cache is not None:
+        return _skills_cache
+    
+    skills_file = Path(__file__).parent / "skills.json"
+    
+    try:
+        with open(skills_file, 'r') as f:
+            data = json.load(f)
+            # If data is a list, assume it's [{"answerKey": [...]}, [...skills...]]
+            if isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict):
+                # Check if first element has answerKey (old format)
+                if "answerKey" in data[0]:
+                    _skills_cache = {}
+                else:
+                    # It's a list of skill objects
+                    _skills_cache = {skill["code"]: skill for skill in data}
+            else:
+                # It's a dict or list of skills
+                _skills_cache = {skill["code"]: skill for skill in data}
+            return _skills_cache
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def get_difficulty_level(skill_code):
+    """
+    Get the difficulty level for a given skill code.
+    
+    Args:
+        skill_code: str representing the skill code (e.g., "1A", "2M1")
+    
+    Returns:
+        int or str: The difficulty level, or None if skill code not found
+    
+    Raises:
+        ValueError: If skill code is not found in skills.json
+    """
+    skills = _load_skills()
+    
+    if skill_code not in skills:
+        raise ValueError(f"Skill code '{skill_code}' not found in skills.json")
+    
+    difficulty = skills[skill_code].get("difficulty_level")
+    # Convert to int if it's a string
+    if isinstance(difficulty, str):
+        try:
+            return int(difficulty)
+        except ValueError:
+            return difficulty
+    return difficulty
+
+
 def number_to_letter(num):
     """
     Convert numeric answer (1, 2, 3, 4) to letter (A, B, C, D).

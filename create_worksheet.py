@@ -106,6 +106,7 @@ def worksheet_to_json(worksheet: list) -> list:
         
         questions.append({
             "question_text": q.question_text,
+            "skill_code": q.skill_code,
             "options": [str(opt) for opt in q.options],
             "correct_option": answer_letter
         })
