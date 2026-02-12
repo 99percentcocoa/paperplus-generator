@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from models import Question
+
 # Cache for skills data
 _skills_cache = None
 
@@ -115,3 +117,44 @@ def letter_to_index(letter):
         raise ValueError(f"Invalid answer letter: {letter}. Must be A, B, C, or D")
     
     return mapping[letter]
+
+def question_to_marathi(question: Question) -> Question:
+    """
+    Convert a Question object to a Marathi string representation.
+    
+    Args:
+        question: Question object to convert
+    
+    Returns:
+        Question: question with question_text and options converted to Marathi
+    """
+    # Placeholder implementation - this would need actual translation logic
+    num1, num2 = [question.question_text.split(" ")[i] for i in [0, -1]]
+    marathi_num1 = arabic_to_devanagari(num1)
+    marathi_num2 = arabic_to_devanagari(num2)
+
+    # Replace numbers in question text
+    marathi_question_text = question.question_text.replace(num1, marathi_num1).replace(num2, marathi_num2)
+
+    # Convert options to Marathi
+    marathi_options = [arabic_to_devanagari(str(opt)) for opt in question.options]
+    
+    # Convert possible_distractors to Marathi
+    marathi_possible_distractors = [arabic_to_devanagari(str(opt)) for opt in question.possible_distractors]
+
+    return Question(
+        question_text=marathi_question_text,
+        skill_code=question.skill_code,
+        options=marathi_options,
+        answer=question.answer,
+        correct_option=question.correct_option,
+        possible_distractors=marathi_possible_distractors
+    )
+
+
+def arabic_to_devanagari(number_string: str) -> str:
+  """Converts a string of Arabic numerals to Devanagari numerals."""
+  arabic_numerals = '0123456789'
+  devanagari_numerals = '०१२३४५६७८९'
+  translation_table = str.maketrans(arabic_numerals, devanagari_numerals)
+  return number_string.translate(translation_table)

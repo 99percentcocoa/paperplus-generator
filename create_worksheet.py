@@ -7,10 +7,11 @@ import json
 import random
 import generate
 import distractors
-from utils import number_to_letter
+from utils import number_to_letter, question_to_marathi
+from models import Question
 
 
-def create_worksheet(skill_distribution: dict = None) -> list:
+def create_worksheet(skill_distribution: dict = None, language: str = "en") -> list:
     """
     Create a 20-question worksheet with questions and distractors.
     
@@ -60,27 +61,40 @@ def create_worksheet(skill_distribution: dict = None) -> list:
             
             # Ensure we have enough distractors
             if len(possible_distractors) < 3:
-                # Fallback: generate generic offsets
-                for offset in [-2, -1, 1, 2]:
-                    possible_distractors.append(int(correct_ans) + offset)
+                # Fallback: generate positive offsets only
+                correct_val = int(correct_ans)
+                # Generate candidates with positive offsets
+                candidates = []
+                for offset in [1, 2, 3, 4, 5, 6, 7, 8]:
+                    candidate = correct_val + offset
+                    candidates.append(candidate)
+                # Also add some below (but keep non-negative)
+                for offset in [1, 2, 3]:
+                    candidate = correct_val - offset
+                    if candidate >= 0:
+                        candidates.append(candidate)
+                possible_distractors.extend(candidates)
                 possible_distractors = list(set(possible_distractors))
-                # Remove correct answer and ensure we have 3+
-                possible_distractors = [d for d in possible_distractors if d != correct_ans][:3]
+                # Remove correct answer and take first 3
+                possible_distractors = [d for d in possible_distractors if d != correct_val][:3]
             
             # Create Question object
-            question = generate.Question(
+            question = Question(
                 question_text=question_text,
                 skill_code=skill_code,
                 options=[correct_ans],  # Will be replaced by choose_distractors
                 answer=1,  # Will be updated by choose_distractors
                 possible_distractors=possible_distractors
             )
+
+            if language == "mr":
+                question = question_to_marathi(question)
             
             # Choose distractors and randomize positions
             question.choose_distractors()
             
             # Convert answer from 1-4 to A-D
-            question.answer = number_to_letter(question.answer)
+            question.correct_option = number_to_letter(question.answer)
             
             worksheet.append(question)
     
@@ -144,7 +158,7 @@ def worksheet_to_json(worksheet: list) -> list:
     
     for q in worksheet:
         # answer is already a letter (A-D) from create_worksheet
-        answer_letter = q.answer
+        answer_letter = q.correct_option
         
         questions.append({
             "question_text": q.question_text,
@@ -168,8 +182,8 @@ def save_worksheet(worksheet_data: list, filename: str = "worksheet.json"):
         worksheet_data: List with [{"answerKey": [...]}, [...questions...]]
         filename: Output filename
     """
-    with open(filename, "w") as f:
-        json.dump(worksheet_data, f, indent=2)
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(worksheet_data, f, indent=2, ensure_ascii=False)
     print(f"Worksheet saved to {filename}")
 
 
@@ -177,28 +191,31 @@ if __name__ == "__main__":
     print("Creating 20-question worksheet...")
     
     # Create worksheet with custom distribution (optional)
-    custom_distribution = {
-        "1A": 3,
-        "1S": 2,
-        "2A1": 3,
-        "2A2": 2,
-        "2S1": 2,
-        "2S2": 2,
-        "T5": 2,
-        "T10": 1,
-        "3A": 1,
-        "3S": 1,
-        "2M1": 1,
-    }
-    
-    worksheet = create_worksheet(custom_distribution)
+    # custom_distribution = {
+    #     "1A": 3,
+    #     "1S": 2,
+    #     "2A1": 3,
+    #     "2A2": 2,
+    #     "2S1": 2,
+    #     "2S2": 2,
+    #     "T5": 2,
+    #     "T10": 1,
+    #     "3A": 1,
+    #     "3S": 1,
+    #     "2M1": 1,
+    # }
+
+    distribution = create_difficulty_distribution(difficulty_level=1)
+    print(f"Generated skill distribution: {distribution}")
+
+    worksheet = create_worksheet(skill_distribution=distribution, language="mr")
     print(f"Created {len(worksheet)} questions")
     
     # Convert to JSON format
     worksheet_json = worksheet_to_json(worksheet)
     
     # Save to file
-    save_worksheet(worksheet_json, "worksheet.json")
+    save_worksheet(worksheet_json, "diff1mar.json")
     
     # Also print a preview
     print("\n--- Worksheet Preview ---")

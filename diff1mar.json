@@ -1,0 +1,248 @@
+[
+  {
+    "answerKey": [
+      "D",
+      "D",
+      "A",
+      "B",
+      "A",
+      "A",
+      "A",
+      "B",
+      "A",
+      "C",
+      "B",
+      "D",
+      "C",
+      "D",
+      "B",
+      "C",
+      "D",
+      "C",
+      "A",
+      "A"
+    ]
+  },
+  [
+    {
+      "question_text": "६ + ३",
+      "skill_code": "1A",
+      "options": [
+        "७",
+        "११",
+        "१०",
+        "९"
+      ],
+      "correct_option": "D"
+    },
+    {
+      "question_text": "६ + ३",
+      "skill_code": "1A",
+      "options": [
+        "११",
+        "८",
+        "७",
+        "९"
+      ],
+      "correct_option": "D"
+    },
+    {
+      "question_text": "५ + ३",
+      "skill_code": "1A",
+      "options": [
+        "८",
+        "६",
+        "१०",
+        "७"
+      ],
+      "correct_option": "A"
+    },
+    {
+      "question_text": "२ + १",
+      "skill_code": "1A",
+      "options": [
+        "४",
+        "३",
+        "२",
+        "५"
+      ],
+      "correct_option": "B"
+    },
+    {
+      "question_text": "२ + ६",
+      "skill_code": "1A",
+      "options": [
+        "८",
+        "७",
+        "६",
+        "१०"
+      ],
+      "correct_option": "A"
+    },
+    {
+      "question_text": "१ + ३",
+      "skill_code": "1A",
+      "options": [
+        "४",
+        "२",
+        "६",
+        "३"
+      ],
+      "correct_option": "A"
+    },
+    {
+      "question_text": "४ + ०",
+      "skill_code": "1A",
+      "options": [
+        "४",
+        "२",
+        "३",
+        "५"
+      ],
+      "correct_option": "A"
+    },
+    {
+      "question_text": "३ + ५",
+      "skill_code": "1A",
+      "options": [
+        "७",
+        "८",
+        "१०",
+        "६"
+      ],
+      "correct_option": "B"
+    },
+    {
+      "question_text": "८ + १",
+      "skill_code": "1A",
+      "options": [
+        "९",
+        "७",
+        "८",
+        "१०"
+      ],
+      "correct_option": "A"
+    },
+    {
+      "question_text": "३ + १",
+      "skill_code": "1A",
+      "options": [
+        "५",
+        "३",
+        "४",
+        "२"
+      ],
+      "correct_option": "C"
+    },
+    {
+      "question_text": "४ + ०",
+      "skill_code": "1A",
+      "options": [
+        "२",
+        "४",
+        "६",
+        "५"
+      ],
+      "correct_option": "B"
+    },
+    {
+      "question_text": "३ + ०",
+      "skill_code": "1A",
+      "options": [
+        "४",
+        "१",
+        "२",
+        "३"
+      ],
+      "correct_option": "D"
+    },
+    {
+      "question_text": "१ + ०",
+      "skill_code": "1A",
+      "options": [
+        "३",
+        "०",
+        "१",
+        "२"
+      ],
+      "correct_option": "C"
+    },
+    {
+      "question_text": "२ + ३",
+      "skill_code": "1A",
+      "options": [
+        "६",
+        "३",
+        "७",
+        "५"
+      ],
+      "correct_option": "D"
+    },
+    {
+      "question_text": "५ + ०",
+      "skill_code": "1A",
+      "options": [
+        "३",
+        "५",
+        "६",
+        "७"
+      ],
+      "correct_option": "B"
+    },
+    {
+      "question_text": "७ - ५",
+      "skill_code": "1S",
+      "options": [
+        "४",
+        "०",
+        "२",
+        "१"
+      ],
+      "correct_option": "C"
+    },
+    {
+      "question_text": "८ × ५",
+      "skill_code": "T5",
+      "options": [
+        "२४",
+        "४८",
+        "५६",
+        "४०"
+      ],
+      "correct_option": "D"
+    },
+    {
+      "question_text": "७३ + ६",
+      "skill_code": "2A1",
+      "options": [
+        "१३३",
+        "७८",
+        "७९",
+        "८०"
+      ],
+      "correct_option": "C"
+    },
+    {
+      "question_text": "३७ + ५२",
+      "skill_code": "2A2",
+      "options": [
+        "८९",
+        "७९",
+        "८८",
+        "९९"
+      ],
+      "correct_option": "A"
+    },
+    {
+      "question_text": "५८ - ५",
+      "skill_code": "2S1",
+      "options": [
+        "५३",
+        "५२",
+        "६३",
+        "५४"
+      ],
+      "correct_option": "A"
+    }
+  ]
+]
