@@ -87,6 +87,48 @@ def create_worksheet(skill_distribution: dict = None) -> list:
     return worksheet
 
 
+def create_difficulty_distribution(difficulty_level: int) -> dict:
+    """
+    Create a random skill distribution for a given difficulty level.
+    
+    Args:
+        difficulty_level: Difficulty level (1-7) as specified in skills.json
+    
+    Returns:
+        Dict mapping skill_code to number of questions, summing to 20.
+    """
+    # Load skills from skills.json
+    with open("skills.json", "r") as f:
+        skills = json.load(f)
+    
+    # Filter skills by difficulty level (stored as string in skills.json)
+    skills_at_level = [s for s in skills if s["difficulty_level"] == str(difficulty_level)]
+    
+    if not skills_at_level:
+        raise ValueError(f"No skills found at difficulty level {difficulty_level}")
+    
+    # Get skill codes
+    skill_codes = [s["code"] for s in skills_at_level]
+    
+    # Create random distribution summing to 20
+    distribution = {}
+    remaining = 20
+    
+    # Randomly assign questions to each skill code except the last
+    for i, skill_code in enumerate(skill_codes[:-1]):
+        # Ensure at least 1 question per remaining skill
+        max_questions = remaining - (len(skill_codes) - i - 1)
+        num_questions = random.randint(1, max_questions)
+        distribution[skill_code] = num_questions
+        remaining -= num_questions
+    
+    # Assign remaining questions to the last skill
+    if skill_codes:
+        distribution[skill_codes[-1]] = remaining
+    
+    return distribution
+
+
 def worksheet_to_json(worksheet: list) -> list:
     """
     Convert worksheet to JSON-serializable format matching example_worksheet.json template.
