@@ -161,6 +161,23 @@ def gen_2S2() -> Tuple[str, Answer]:
     b = 10 * t2 + u2
     return f"{a} - {b}", a - b
 
+def gen_2S2B() -> Tuple[str, Answer]:
+    """2 - 2 digit subtraction - single borrow (units place requires borrow, tens does not)"""
+    while True:
+        t1 = random.randint(1, 9)
+        u1 = random.randint(0, 9)
+        t2 = random.randint(1, 9)
+        u2 = random.randint(0, 9)
+        a = 10 * t1 + u1
+        b = 10 * t2 + u2
+        if a <= b:
+            continue
+        # Single borrow: units requires borrow but tens doesn't
+        # Units borrow if u1 < u2
+        # After borrowing for units, tens has (t1 - 1), which must be >= t2
+        if u1 < u2 and (t1 - 1) >= t2:
+            return f"{a} - {b}", a - b
+
 def gen_T10() -> Tuple[str, Answer]:
     """Multiplication tables - 5 to 10 (i.e., choose multiplier 5..10)"""
     a = random.randint(6, 10)
@@ -476,7 +493,7 @@ _gen_map = {
     "3AC": gen_3AC,
     "3S": gen_3S,
     # 2S1B already above
-    "2S2B": gen_3SB2,  # fallback mapping (2S2B: 2-2 digit subtraction borrow) -- reusing 3SB2 may not be perfect
+    "2S2B": gen_2S2B,
     "3AC2": gen_3AC2,
     "3SB": gen_3SB,
     "3SB2": gen_3SB2,
