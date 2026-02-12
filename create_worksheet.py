@@ -7,6 +7,7 @@ import json
 import random
 import generate
 import distractors
+from utils import number_to_letter
 
 
 def create_worksheet(skill_distribution: dict = None) -> list:
@@ -78,46 +79,50 @@ def create_worksheet(skill_distribution: dict = None) -> list:
             # Choose distractors and randomize positions
             question.choose_distractors()
             
+            # Convert answer from 1-4 to A-D
+            question.answer = number_to_letter(question.answer)
+            
             worksheet.append(question)
     
     return worksheet
 
 
-def worksheet_to_json(worksheet: list) -> dict:
+def worksheet_to_json(worksheet: list) -> list:
     """
-    Convert worksheet to JSON-serializable format.
+    Convert worksheet to JSON-serializable format matching example_worksheet.json template.
     
     Args:
         worksheet: List of Question objects
     
     Returns:
-        Dict with worksheet data
+        List with [{"answerKey": [...]}, [...questions...]]
     """
     questions = []
     answer_key = []
     
-    for i, q in enumerate(worksheet):
+    for q in worksheet:
+        # answer is already a letter (A-D) from create_worksheet
+        answer_letter = q.answer
+        
         questions.append({
             "question_text": q.question_text,
-            "skill_code": q.skill_code,
             "options": [str(opt) for opt in q.options],
-            "correct_option": q.answer - 1,  # 0-based index
-            "possible_distractors": [str(d) for d in q.possible_distractors]
+            "correct_option": answer_letter
         })
-        answer_key.append(chr(65 + q.answer - 1))
+        answer_key.append(answer_letter)
     
-    return {
-        "worksheet": questions,
-        "answer_key": answer_key
-    }
+    return [
+        {"answerKey": answer_key},
+        questions
+    ]
 
 
-def save_worksheet(worksheet_data: dict, filename: str = "worksheet.json"):
+def save_worksheet(worksheet_data: list, filename: str = "worksheet.json"):
     """
     Save worksheet data to JSON file.
     
     Args:
-        worksheet_data: Dict with worksheet data
+        worksheet_data: List with [{"answerKey": [...]}, [...questions...]]
         filename: Output filename
     """
     with open(filename, "w") as f:
@@ -154,8 +159,9 @@ if __name__ == "__main__":
     
     # Also print a preview
     print("\n--- Worksheet Preview ---")
-    for q in worksheet_json["worksheet"][:3]:
-        print(f"\n{q['number']}. {q['question']} [{q['skill_code']}]")
+    questions = worksheet_json[1]  # Questions are in the second element
+    for q in questions[:3]:
+        print(f"\n{q['question_text']}")
         for i, opt in enumerate(q['options']):
             print(f"   {chr(65 + i)}) {opt}")
-    print(f"\n... and {len(worksheet_json['worksheet']) - 3} more questions")
+    print(f"\n... and {len(questions) - 3} more questions")
