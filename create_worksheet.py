@@ -10,6 +10,18 @@ import distractors
 from utils import number_to_letter, question_to_marathi
 from models import Question
 
+# Worksheet levels map to difficulty level distributions
+# Keys are difficulty levels, values are proportions of 20 questions
+WORKSHEET_LEVEL_DISTRIBUTIONS = {
+    "A": {1: 1.0},
+    "B": {1: 0.5, 2: 0.5},
+    "C": {1: 0.25, 2: 0.25, 3: 0.5},
+    "D": {1: 0.125, 2: 0.125, 3: 0.25, 4: 0.5},  # 1-2 (25%) split evenly
+    "E": {1: 1/12, 2: 1/12, 3: 1/12, 4: 0.25, 5: 0.5},  # 1-3 (25%) split evenly
+    "F": {1: 1/16, 2: 1/16, 3: 1/16, 4: 1/16, 5: 0.25, 6: 0.5},  # 1-4 (25%) split evenly
+    "G": {1: 0.05, 2: 0.05, 3: 0.05, 4: 0.05, 5: 0.05, 6: 0.25, 7: 0.5},  # 1-5 (25%) split evenly
+}
+
 
 def create_worksheet(skill_distribution: dict = None, language: str = "en") -> list:
     """
@@ -50,6 +62,11 @@ def create_worksheet(skill_distribution: dict = None, language: str = "en") -> l
         raw_questions = generate.gen_questions(skill_code, num_questions)
         
         for question_text, correct_ans in raw_questions:
+            # Handle tuple answers (quotient, remainder) for division problems
+            if isinstance(correct_ans, tuple):
+                quotient, remainder = correct_ans
+                correct_ans = f"{quotient}R{remainder}"
+            
             # Generate possible distractors
             try:
                 possible_distractors = distractors.generate_distractors(
@@ -62,21 +79,25 @@ def create_worksheet(skill_distribution: dict = None, language: str = "en") -> l
             # Ensure we have enough distractors
             if len(possible_distractors) < 3:
                 # Fallback: generate positive offsets only
-                correct_val = int(correct_ans)
-                # Generate candidates with positive offsets
-                candidates = []
-                for offset in [1, 2, 3, 4, 5, 6, 7, 8]:
-                    candidate = correct_val + offset
-                    candidates.append(candidate)
-                # Also add some below (but keep non-negative)
-                for offset in [1, 2, 3]:
-                    candidate = correct_val - offset
-                    if candidate >= 0:
+                try:
+                    correct_val = int(correct_ans) if not isinstance(correct_ans, str) else int(correct_ans.split()[0])
+                    # Generate candidates with positive offsets
+                    candidates = []
+                    for offset in [1, 2, 3, 4, 5, 6, 7, 8]:
+                        candidate = correct_val + offset
                         candidates.append(candidate)
-                possible_distractors.extend(candidates)
-                possible_distractors = list(set(possible_distractors))
-                # Remove correct answer and take first 3
-                possible_distractors = [d for d in possible_distractors if d != correct_val][:3]
+                    # Also add some below (but keep non-negative)
+                    for offset in [1, 2, 3]:
+                        candidate = correct_val - offset
+                        if candidate >= 0:
+                            candidates.append(candidate)
+                    possible_distractors.extend(candidates)
+                    possible_distractors = list(set(possible_distractors))
+                    # Remove correct answer and take first 3
+                    possible_distractors = [d for d in possible_distractors if d != correct_val][:3]
+                except (ValueError, AttributeError):
+                    # If we can't generate numeric distractors, use generic ones
+                    possible_distractors = [f"{int(correct_ans.split()[0]) + i}R{i}" for i in [1, 2, 3]]
             
             # Create Question object
             question = Question(
@@ -143,6 +164,91 @@ def create_difficulty_distribution(difficulty_level: int) -> dict:
     return distribution
 
 
+def create_worksheet_level_distribution(worksheet_level: str) -> dict:
+    """
+    Create a skill distribution for a worksheet level (A-G).
+    
+    Each level mixes skills from different difficulty levels:
+    - A: level 1 (100%)
+    - B: level 1 (50%), level 2 (50%)
+    - C: level 1 (25%), level 2 (25%), level 3 (50%)
+    - D: level 1-2 (25% total), level 3 (25%), level 4 (50%)
+    - E: level 1-3 (25% total), level 4 (25%), level 5 (50%)
+    - F: level 1-4 (25% total), level 5 (25%), level 6 (50%)
+    - G: level 1-5 (25% total), level 6 (25%), level 7 (50%)
+    
+    Args:
+        worksheet_level: Worksheet level letter (A-G)
+    
+    Returns:
+        Dict mapping skill_code to number of questions, summing to 20.
+    """
+    # Load skills from skills.json
+    with open("skills.json", "r") as f:
+        skills = json.load(f)
+    
+    if worksheet_level not in WORKSHEET_LEVEL_DISTRIBUTIONS:
+        valid_levels = ", ".join(WORKSHEET_LEVEL_DISTRIBUTIONS.keys())
+        raise ValueError(f"Invalid worksheet level: {worksheet_level}. Must be one of: {valid_levels}")
+    
+    difficulty_distribution = WORKSHEET_LEVEL_DISTRIBUTIONS[worksheet_level]
+    skill_distribution = {}
+    
+    # First pass: calculate questions per difficulty level
+    # Use rounding but ensure the last level gets remaining questions to sum to 20
+    difficulty_question_counts = {}
+    total_allocated = 0
+    sorted_difficulties = sorted(difficulty_distribution.items())
+    
+    for i, (difficulty_level, proportion) in enumerate(sorted_difficulties):
+        if i == len(sorted_difficulties) - 1:
+            # Last difficulty level gets remaining questions
+            num_questions = 20 - total_allocated
+        else:
+            num_questions = round(20 * proportion)
+            total_allocated += num_questions
+        
+        difficulty_question_counts[difficulty_level] = num_questions
+    
+    # Second pass: for each difficulty level, randomly distribute questions among skills
+    for difficulty_level, num_questions in difficulty_question_counts.items():
+        if num_questions == 0:
+            continue
+        
+        # Get skills at this difficulty level
+        skills_at_level = [s for s in skills if s["difficulty_level"] == str(difficulty_level)]
+        
+        if not skills_at_level:
+            raise ValueError(f"No skills found at difficulty level {difficulty_level}")
+        
+        skill_codes = [s["code"] for s in skills_at_level]
+        
+        # Randomly distribute questions among skills at this level
+        remaining = num_questions
+        
+        for i, skill_code in enumerate(skill_codes[:-1]):
+            if remaining <= 0:
+                break
+            
+            # Ensure at least 1 question per remaining skill
+            max_for_skill = remaining - (len(skill_codes) - i - 2)
+            questions_for_skill = random.randint(1, max(1, max_for_skill))
+            
+            if questions_for_skill > 0:
+                skill_distribution[skill_code] = questions_for_skill
+                remaining -= questions_for_skill
+        
+        # Remaining goes to last skill
+        if skill_codes and remaining > 0:
+            last_skill = skill_codes[-1]
+            if last_skill in skill_distribution:
+                skill_distribution[last_skill] += remaining
+            else:
+                skill_distribution[last_skill] = remaining
+    
+    return skill_distribution
+
+
 def worksheet_to_json(worksheet: list) -> list:
     """
     Convert worksheet to JSON-serializable format matching example_worksheet.json template.
@@ -188,40 +294,32 @@ def save_worksheet(worksheet_data: list, filename: str = "worksheet.json"):
 
 
 if __name__ == "__main__":
-    print("Creating 20-question worksheet...")
+    print("Creating 20-question worksheets for levels A-G...")
     
-    # Create worksheet with custom distribution (optional)
-    # custom_distribution = {
-    #     "1A": 3,
-    #     "1S": 2,
-    #     "2A1": 3,
-    #     "2A2": 2,
-    #     "2S1": 2,
-    #     "2S2": 2,
-    #     "T5": 2,
-    #     "T10": 1,
-    #     "3A": 1,
-    #     "3S": 1,
-    #     "2M1": 1,
-    # }
-
-    distribution = create_difficulty_distribution(difficulty_level=1)
-    print(f"Generated skill distribution: {distribution}")
-
-    worksheet = create_worksheet(skill_distribution=distribution, language="mr")
-    print(f"Created {len(worksheet)} questions")
-    
-    # Convert to JSON format
-    worksheet_json = worksheet_to_json(worksheet)
-    
-    # Save to file
-    save_worksheet(worksheet_json, "diff1mar.json")
-    
-    # Also print a preview
-    print("\n--- Worksheet Preview ---")
-    questions = worksheet_json[1]  # Questions are in the second element
-    for q in questions[:3]:
-        print(f"\n{q['question_text']}")
-        for i, opt in enumerate(q['options']):
-            print(f"   {chr(65 + i)}) {opt}")
-    print(f"\n... and {len(questions) - 3} more questions")
+    # Create worksheets for each level (A-G)
+    for level in "ABCDEFG":
+        print(f"\n--- Creating Worksheet Level {level} ---")
+        
+        # Generate distribution for this level
+        distribution = create_worksheet_level_distribution(level)
+        print(f"Generated skill distribution: {distribution}")
+        
+        # Create worksheet in English
+        worksheet = create_worksheet(skill_distribution=distribution, language="en")
+        print(f"Created {len(worksheet)} questions")
+        
+        # Convert to JSON format
+        worksheet_json = worksheet_to_json(worksheet)
+        
+        # Save to file
+        filename = f"worksheet_level_{level}.json"
+        filename = f"generated/{filename}"
+        save_worksheet(worksheet_json, filename)
+        
+        # Print a preview
+        print(f"Preview of first 2 questions:")
+        questions = worksheet_json[1]
+        for q in questions[:2]:
+            print(f"\n{q['question_text']}")
+            for i, opt in enumerate(q['options']):
+                print(f"   {chr(65 + i)}) {opt}")
