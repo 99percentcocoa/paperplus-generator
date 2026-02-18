@@ -249,7 +249,7 @@ def create_worksheet_level_distribution(worksheet_level: str) -> dict:
     return skill_distribution
 
 
-def worksheet_to_json(worksheet: list) -> list:
+def worksheet_to_json(name: str, worksheet: list) -> list:
     """
     Convert worksheet to JSON-serializable format matching example_worksheet.json template.
     
@@ -275,22 +275,22 @@ def worksheet_to_json(worksheet: list) -> list:
         answer_key.append(answer_letter)
     
     return [
-        {"answerKey": answer_key},
+        {"name": name, "answerKey": answer_key},
         questions
     ]
 
 
-def save_worksheet(worksheet_data: list, filename: str = "worksheet.json"):
+def save_worksheet(worksheet_data: list, filepath: str = "worksheet.json"):
     """
     Save worksheet data to JSON file.
     
     Args:
         worksheet_data: List with [{"answerKey": [...]}, [...questions...]]
-        filename: Output filename
+        filepath: Output file path
     """
-    with open(filename, "w", encoding="utf-8") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(worksheet_data, f, indent=2, ensure_ascii=False)
-    print(f"Worksheet saved to {filename}")
+    print(f"Worksheet saved to {filepath}")
 
 
 if __name__ == "__main__":
@@ -304,17 +304,20 @@ if __name__ == "__main__":
         distribution = create_worksheet_level_distribution(level)
         print(f"Generated skill distribution: {distribution}")
         
-        # Create worksheet in English
+        # Create worksheet in Marathi
         worksheet = create_worksheet(skill_distribution=distribution, language="en")
         print(f"Created {len(worksheet)} questions")
         
-        # Convert to JSON format
-        worksheet_json = worksheet_to_json(worksheet)
         
         # Save to file
-        filename = f"worksheet_level_{level}.json"
-        filename = f"generated/{filename}"
-        save_worksheet(worksheet_json, filename)
+        wsname = f"en_level_{level}"
+        filename = f"{wsname}.json"
+        filepath = f"generated/{filename}"
+
+        # Convert to JSON format
+        worksheet_json = worksheet_to_json(name=wsname, worksheet=worksheet)
+
+        save_worksheet(worksheet_json, filepath)
         
         # Print a preview
         print(f"Preview of first 2 questions:")
