@@ -62,9 +62,16 @@ def gen_1AC() -> Tuple[str, Answer]:
     a = random.randint(1, 9)
     b = random.randint(1, 9)
     # ensure carry
+    max_iterations = 1000
+    iterations = 0
     while a + b < 10:
         a = random.randint(1, 9)
         b = random.randint(1, 9)
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: force a carry
+            a, b = 9, 9
+            break
     return f"{a} + {b}", a + b
 
 def gen_2A1C() -> Tuple[str, Answer]:
@@ -73,9 +80,16 @@ def gen_2A1C() -> Tuple[str, Answer]:
     u1 = random.randint(0, 9)
     one = random.randint(0, 9)
     # ensure units produce carry
+    max_iterations = 1000
+    iterations = 0
     while (u1 + one) < 10:
         u1 = random.randint(0, 9)
         one = random.randint(0, 9)
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: force a carry
+            u1, one = 9, 9
+            break
     a = 10 * tens + u1
     return f"{a} + {one}", a + one
 
@@ -84,6 +98,8 @@ def gen_2A2C() -> Tuple[str, Answer]:
     # select digits such that:
     # units sum >= 10 -> carry1 = 1
     # tens sum + carry1 >= 10 -> carry2 = 1
+    max_iterations = 1000
+    iterations = 0
     while True:
         u1 = random.randint(0, 9)
         u2 = random.randint(0, 9)
@@ -93,6 +109,11 @@ def gen_2A2C() -> Tuple[str, Answer]:
         if (t1 + t2 + c1) >= 10:
             a = 10 * t1 + u1
             b = 10 * t2 + u2
+            return f"{a} + {b}", a + b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: force double carry
+            a, b = 99, 99
             return f"{a} + {b}", a + b
 
 def gen_2S1B() -> Tuple[str, Answer]:
@@ -116,6 +137,8 @@ def gen_2S2() -> Tuple[str, Answer]:
 
 def gen_2S2B() -> Tuple[str, Answer]:
     """2 - 2 digit subtraction - single borrow (units place requires borrow, tens does not)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         t1 = random.randint(1, 9)
         u1 = random.randint(0, 9)
@@ -124,11 +147,21 @@ def gen_2S2B() -> Tuple[str, Answer]:
         a = 10 * t1 + u1
         b = 10 * t2 + u2
         if a <= b:
+            iterations += 1
+            if iterations > max_iterations:
+                # Fallback: construct a valid single borrow case
+                a, b = 52, 28
+                return f"{a} - {b}", a - b
             continue
         # Single borrow: units requires borrow but tens doesn't
         # Units borrow if u1 < u2
         # After borrowing for units, tens has (t1 - 1), which must be >= t2
         if u1 < u2 and (t1 - 1) >= t2:
+            return f"{a} - {b}", a - b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid single borrow case
+            a, b = 52, 28
             return f"{a} - {b}", a - b
 
 def gen_T10() -> Tuple[str, Answer]:
@@ -142,6 +175,8 @@ def gen_3A() -> Tuple[str, Answer]:
     d1 = random.randint(1, 9)
     d2 = random.randint(0, 9)
     d3 = random.randint(0, 9)
+    max_iterations = 1000
+    iterations = 0
     while True:
         e1 = random.randint(1, 9)
         e2 = random.randint(0, 9)
@@ -150,10 +185,17 @@ def gen_3A() -> Tuple[str, Answer]:
             a = 100 * d1 + 10 * d2 + d3
             b = 100 * e1 + 10 * e2 + e3
             return f"{a} + {b}", a + b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid no-carry case
+            a, b = 111, 222
+            return f"{a} + {b}", a + b
 
 def gen_3AC() -> Tuple[str, Answer]:
     """3-digit addition - single carry (exactly one column causes carry)"""
     # build digits such that exactly one of the three columns has sum >= 10
+    max_iterations = 1000
+    iterations = 0
     while True:
         A = [random.randint(1, 9), random.randint(0, 9), random.randint(0, 9)]
         B = [random.randint(1, 9), random.randint(0, 9), random.randint(0, 9)]
@@ -177,6 +219,11 @@ def gen_3AC() -> Tuple[str, Answer]:
             a = 100 * A[0] + 10 * A[1] + A[2]
             b = 100 * B[0] + 10 * B[1] + B[2]
             return f"{a} + {b}", a + b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a case with exactly 1 carry
+            a, b = 105, 108  # Only units carry: 5+8=13
+            return f"{a} + {b}", a + b
 
 def gen_3S() -> Tuple[str, Answer]:
     """3-digit subtraction - no borrow (digitwise minuend >= subtrahend)"""
@@ -192,6 +239,8 @@ def gen_3S() -> Tuple[str, Answer]:
 
 def gen_3AC2() -> Tuple[str, Answer]:
     """3-digit addition - double carry (exactly two columns cause a carry)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         A = [random.randint(1, 9), random.randint(0, 9), random.randint(0, 9)]
         B = [random.randint(1, 9), random.randint(0, 9), random.randint(0, 9)]
@@ -207,9 +256,16 @@ def gen_3AC2() -> Tuple[str, Answer]:
             a = 100 * A[0] + 10 * A[1] + A[2]
             b = 100 * B[0] + 10 * B[1] + B[2]
             return f"{a} + {b}", a + b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a case with exactly 2 carries
+            a, b = 195, 108  # Units carry (5+8=13), tens carry (9+0+1=10)
+            return f"{a} + {b}", a + b
 
 def gen_3SB() -> Tuple[str, Answer]:
     """3-digit subtraction - single borrow (exactly one borrow occurs)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         A = [random.randint(1, 9), random.randint(0, 9), random.randint(0, 9)]
         B = [random.randint(0, 9), random.randint(0, 9), random.randint(0, 9)]
@@ -217,6 +273,11 @@ def gen_3SB() -> Tuple[str, Answer]:
         a = 100 * A[0] + 10 * A[1] + A[2]
         b = 100 * B[0] + 10 * B[1] + B[2]
         if a <= b:
+            iterations += 1
+            if iterations > max_iterations:
+                # Fallback: construct a valid single borrow case
+                a, b = 325, 218  # Only units borrow: 5<8
+                return f"{a} - {b}", a - b
             continue
         # compute borrows by simulating column subtraction
         borrows = 0
@@ -239,15 +300,27 @@ def gen_3SB() -> Tuple[str, Answer]:
             borrows += 1
         if borrows == 1:
             return f"{a} - {b}", a - b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid single borrow case
+            a, b = 325, 218  # Only units borrow: 5<8
+            return f"{a} - {b}", a - b
 
 def gen_3SB2() -> Tuple[str, Answer]:
     """3-digit subtraction - double borrow (exactly two borrows occur)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         A = [random.randint(1, 9), random.randint(0, 9), random.randint(0, 9)]
         B = [random.randint(0, 9), random.randint(0, 9), random.randint(0, 9)]
         a = 100 * A[0] + 10 * A[1] + A[2]
         b = 100 * B[0] + 10 * B[1] + B[2]
         if a <= b:
+            iterations += 1
+            if iterations > max_iterations:
+                # Fallback: construct a valid double borrow case
+                a, b = 302,  198  # Both units and tens borrow
+                return f"{a} - {b}", a - b
             continue
         borrows = 0
         A2, A1, A0 = A[2], A[1], A[0]
@@ -265,6 +338,11 @@ def gen_3SB2() -> Tuple[str, Answer]:
             borrows += 1
         if borrows == 2:
             return f"{a} - {b}", a - b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid double borrow case
+            a, b = 302, 198  # Both units and tens borrow
+            return f"{a} - {b}", a - b
 
 # -----------------------
 # Multiplication
@@ -272,6 +350,8 @@ def gen_3SB2() -> Tuple[str, Answer]:
 
 def gen_2M1() -> Tuple[str, Answer]:
     """2x1 multiplication - no carry (each digit * multiplier < 10)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         multiplier = random.randint(2, 9)
         tens = random.randint(1, 9)
@@ -279,9 +359,16 @@ def gen_2M1() -> Tuple[str, Answer]:
         if multiplier * units < 10 and multiplier * tens < 10:
             a = 10 * tens + units
             return f"{a} × {multiplier}", a * multiplier
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid no-carry case
+            a, multiplier = 11, 2
+            return f"{a} × {multiplier}", a * multiplier
 
 def gen_3M1() -> Tuple[str, Answer]:
     """3x1 multiplication - no carry (each digit * multiplier < 10)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         multiplier = random.randint(2, 9)
         h = random.randint(1, 9)
@@ -290,9 +377,16 @@ def gen_3M1() -> Tuple[str, Answer]:
         if multiplier * u < 10 and multiplier * t < 10 and multiplier * h < 10:
             a = 100 * h + 10 * t + u
             return f"{a} × {multiplier}", a * multiplier
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid no-carry case
+            a, multiplier = 111, 2
+            return f"{a} × {multiplier}", a * multiplier
 
 def gen_2M1C() -> Tuple[str, Answer]:
     """2x1 multiplication - carry (at least one digit*multiplier >= 10)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         multiplier = random.randint(2, 9)
         tens = random.randint(1, 9)
@@ -300,9 +394,16 @@ def gen_2M1C() -> Tuple[str, Answer]:
         if multiplier * units >= 10 or multiplier * tens >= 10:
             a = 10 * tens + units
             return f"{a} × {multiplier}", a * multiplier
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: force a carry
+            a, multiplier = 15, 2
+            return f"{a} × {multiplier}", a * multiplier
 
 def gen_3M1C() -> Tuple[str, Answer]:
     """3x1 multiplication - single carry (exactly one digit*multiplier produces carry)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         multiplier = random.randint(2, 9)
         h = random.randint(1, 9)
@@ -312,9 +413,16 @@ def gen_3M1C() -> Tuple[str, Answer]:
         if sum(prod_flags) == 1:
             a = 100 * h + 10 * t + u
             return f"{a} × {multiplier}", a * multiplier
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: exactly one carry
+            a, multiplier = 105, 2
+            return f"{a} × {multiplier}", a * multiplier
 
 def gen_3M1C2() -> Tuple[str, Answer]:
     """3x1 multiplication - double carry (exactly two digit*multiplier produces carry)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         multiplier = random.randint(2, 9)
         h = random.randint(1, 9)
@@ -324,9 +432,16 @@ def gen_3M1C2() -> Tuple[str, Answer]:
         if sum(prod_flags) == 2:
             a = 100 * h + 10 * t + u
             return f"{a} × {multiplier}", a * multiplier
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: exactly two carries
+            a, multiplier = 566, 2
+            return f"{a} × {multiplier}", a * multiplier
 
 def gen_2M2() -> Tuple[str, Answer]:
     """2x2 multiplication - no carry. (each single-digit product < 10)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         a1 = random.randint(1, 9)
         a0 = random.randint(0, 9)
@@ -336,9 +451,16 @@ def gen_2M2() -> Tuple[str, Answer]:
             a = 10 * a1 + a0
             b = 10 * b1 + b0
             return f"{a} × {b}", a * b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: no carry case
+            a, b = 11, 22
+            return f"{a} × {b}", a * b
 
 def gen_2M2C() -> Tuple[str, Answer]:
     """2x2 multiplication - carry (at least one single-digit product >= 10)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         a1 = random.randint(1, 9)
         a0 = random.randint(0, 9)
@@ -349,9 +471,16 @@ def gen_2M2C() -> Tuple[str, Answer]:
             a = 10 * a1 + a0
             b = 10 * b1 + b0
             return f"{a} × {b}", a * b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: force a carry
+            a, b = 15, 16
+            return f"{a} × {b}", a * b
 
 def gen_3M2C() -> Tuple[str, Answer]:
     """3x2 multiplication - carry (three-digit times two-digit where at least one single-digit product >= 10)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         a2 = random.randint(1, 9)
         a1 = random.randint(0, 9)
@@ -362,6 +491,11 @@ def gen_3M2C() -> Tuple[str, Answer]:
         if cond:
             a = 100 * a2 + 10 * a1 + a0
             b = 10 * b1 + b0
+            return f"{a} × {b}", a * b
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: force a carry
+            a, b = 115, 16
             return f"{a} × {b}", a * b
 
 # -----------------------
@@ -383,30 +517,53 @@ def gen_2D1() -> Tuple[str, Answer]:
 
 def gen_3D1() -> Tuple[str, Answer]:
     """3/1 division without remainder (three-digit dividend divided by one-digit divisor evenly)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         dividend = random.randint(100, 999)
         divisor = random.randint(2, 9)
         if dividend % divisor == 0:
             return f"{dividend} ÷ {divisor}", dividend // divisor
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid division
+            dividend, divisor = 120, 2
+            return f"{dividend} ÷ {divisor}", dividend // divisor
 
 def gen_2D1R() -> Tuple[str, Answer]:
     """2/1 division with remainder (two-digit dividend divided by one-digit divisor with remainder)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         dividend = random.randint(10, 99)
         divisor = random.randint(2, 9)
         if dividend % divisor != 0:
             return f"{dividend} ÷ {divisor}", (dividend // divisor, dividend % divisor)
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid division with remainder
+            dividend, divisor = 23, 5
+            return f"{dividend} ÷ {divisor}", (dividend // divisor, dividend % divisor)
 
 def gen_3D1R() -> Tuple[str, Answer]:
     """3/1 division with remainder (three-digit dividend divided by one-digit divisor with remainder)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         dividend = random.randint(100, 999)
         divisor = random.randint(2, 9)
         if dividend % divisor != 0:
             return f"{dividend} ÷ {divisor}", (dividend // divisor, dividend % divisor)
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid division with remainder
+            dividend, divisor = 123, 5
+            return f"{dividend} ÷ {divisor}", (dividend // divisor, dividend % divisor)
 
 def gen_3D1Z() -> Tuple[str, Answer]:
     """3/1 division with 0 in quotient (we produce a division where quotient's middle digit is 0, no remainder)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         divisor = random.randint(2, 9)
         # construct quotient as a0b with 3-digit quotient
@@ -416,13 +573,25 @@ def gen_3D1Z() -> Tuple[str, Answer]:
         dividend = divisor * quo
         if 100 <= dividend <= 999:
             return f"{dividend} ÷ {divisor}", quo
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid case
+            dividend, divisor, quo = 202, 2, 101
+            return f"{dividend} ÷ {divisor}", quo
 
 def gen_4D1R() -> Tuple[str, Answer]:
     """4/1 division with remainder (four-digit dividend divided by one-digit divisor with remainder)"""
+    max_iterations = 1000
+    iterations = 0
     while True:
         dividend = random.randint(1000, 9999)
         divisor = random.randint(2, 9)
         if dividend % divisor != 0:
+            return f"{dividend} ÷ {divisor}", (dividend // divisor, dividend % divisor)
+        iterations += 1
+        if iterations > max_iterations:
+            # Fallback: construct a valid division with remainder
+            dividend, divisor = 1234, 5
             return f"{dividend} ÷ {divisor}", (dividend // divisor, dividend % divisor)
 
 # -----------------------
