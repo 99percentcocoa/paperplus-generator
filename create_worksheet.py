@@ -275,8 +275,11 @@ def worksheet_to_json(name: str, worksheet: list) -> list:
         answer_key.append(answer_letter)
     
     return [
-        {"name": name, "answerKey": answer_key},
-        questions
+        {
+            "name": name, 
+            "answerKey": answer_key,
+            "questions": questions
+        }
     ]
 
 
@@ -305,12 +308,12 @@ if __name__ == "__main__":
         print(f"Generated skill distribution: {distribution}")
         
         # Create worksheet in Marathi
-        worksheet = create_worksheet(skill_distribution=distribution, language="en")
+        worksheet = create_worksheet(skill_distribution=distribution, language="mr")
         print(f"Created {len(worksheet)} questions")
         
         
         # Save to file
-        wsname = f"en_level_{level}"
+        wsname = f"mr_level_{level}"
         filename = f"{wsname}.json"
         filepath = f"generated/{filename}"
 
@@ -321,7 +324,7 @@ if __name__ == "__main__":
         
         # Print a preview
         print(f"Preview of first 2 questions:")
-        questions = worksheet_json[1]
+        questions = worksheet_json[0].get("questions", [])
         for q in questions[:2]:
             print(f"\n{q['question_text']}")
             for i, opt in enumerate(q['options']):
