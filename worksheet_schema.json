@@ -2,6 +2,9 @@
     "description": "Schema for a worksheet object.",
     "type": "object",
     "properties": {
+        "worksheet_id": {
+            "type": "integer"
+        },
         "title": {
             "type": "string"
         },

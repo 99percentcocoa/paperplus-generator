@@ -2,6 +2,12 @@
     "description": "Schema for a question object within a worksheet.",
     "type": "object",
     "properties": {
+        "worksheet_id": {
+            "type": "integer"
+        },
+        "question_id": {
+            "type": "integer"
+        },
         "index": {
             "type": "integer"
         },
