@@ -1,0 +1,23 @@
+{
+    "description": "Schema for a worksheet object.",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string"
+        },
+        "level": {
+            "type": "string",
+            "description": "The difficulty level of the worksheet. Should be one of 'A', 'B', 'C', 'D', or 'E'."
+        },
+        "language": {
+            "type": "string",
+            "description": "The language of the worksheet. Should be one of 'en' or 'mr'."
+        },
+        "questions": {
+            "type": "array",
+            "items": {
+                "$ref": "question_schema.json"
+            }
+        }
+    }
+}

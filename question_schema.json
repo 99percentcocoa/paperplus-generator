@@ -1,0 +1,25 @@
+{
+    "description": "Schema for a question object within a worksheet.",
+    "type": "object",
+    "properties": {
+        "index": {
+            "type": "integer"
+        },
+        "question_text": {
+            "type": "string"
+        },
+        "skill_code": {
+            "type": "string"
+        },
+        "options": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "correct_option": {
+            "type": "string",
+            "description": "The correct option for the question. Should be one of 'A', 'B', 'C', or 'D'."
+        }
+    }
+}
