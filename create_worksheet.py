@@ -249,7 +249,7 @@ def create_worksheet_level_distribution(worksheet_level: str) -> dict:
     return skill_distribution
 
 
-def worksheet_to_json(name: str, worksheet: list) -> list:
+def worksheet_to_json(name: str, worksheet: list, level: str, language: str) -> list:
     """
     Convert worksheet to JSON-serializable format matching example_worksheet.json template.
     
@@ -276,8 +276,9 @@ def worksheet_to_json(name: str, worksheet: list) -> list:
     
     return [
         {
-            "name": name, 
-            "answerKey": answer_key,
+            "title": name,
+            "level": level,
+            "language": language,
             "questions": questions
         }
     ]
@@ -295,30 +296,36 @@ def save_worksheet(worksheet_data: list, filepath: str = "worksheet.json"):
         json.dump(worksheet_data, f, indent=2, ensure_ascii=False)
     print(f"Worksheet saved to {filepath}")
 
+def create_worksheet_json(title: str, level: str, language: str) -> list:
+    """
+    Create a worksheet JSON structure from level and language.
+    
+    Args:
+        title: Title of the worksheet
+        level: Worksheet level (A-G)
+        language: Language code (e.g., "en", "mr")
+    
+    Returns:
+        List as per worksheet JSON schema.
+    """
+    distribution = create_worksheet_level_distribution(level)
+    worksheet = create_worksheet(skill_distribution=distribution, language=language)
+    worksheet_json = worksheet_to_json(name=title, worksheet=worksheet, level=level, language=language)
+    return worksheet_json
+
 
 if __name__ == "__main__":
     print("Creating 20-question worksheets for levels A-G...")
     
     # Create worksheets for each level (A-G)
     for level in "ABCDEFG":
-        print(f"\n--- Creating Worksheet Level {level} ---")
         
-        # Generate distribution for this level
-        distribution = create_worksheet_level_distribution(level)
-        print(f"Generated skill distribution: {distribution}")
-        
-        # Create worksheet in Marathi
-        worksheet = create_worksheet(skill_distribution=distribution, language="mr")
-        print(f"Created {len(worksheet)} questions")
-        
+        worksheet_json = create_worksheet_json(title=f"Worksheet Level {level}", level=level, language="mr")
         
         # Save to file
         wsname = f"mr_level_{level}"
         filename = f"{wsname}.json"
         filepath = f"generated/{filename}"
-
-        # Convert to JSON format
-        worksheet_json = worksheet_to_json(name=wsname, worksheet=worksheet)
 
         save_worksheet(worksheet_json, filepath)
         
