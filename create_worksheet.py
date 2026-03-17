@@ -67,37 +67,12 @@ def create_worksheet(skill_distribution: dict = None, language: str = "en") -> l
                 quotient, remainder = correct_ans
                 correct_ans = f"{quotient}R{remainder}"
             
-            # Generate possible distractors
-            try:
-                possible_distractors = distractors.generate_distractors(
-                    skill_code, question_text, correct_ans
-                )
-            except Exception as e:
-                print(f"Error generating distractors for {skill_code}: {e}")
-                possible_distractors = []
-            
-            # Ensure we have enough distractors
-            if len(possible_distractors) < 3:
-                # Fallback: generate positive offsets only
-                try:
-                    correct_val = int(correct_ans) if not isinstance(correct_ans, str) else int(correct_ans.split()[0])
-                    # Generate candidates with positive offsets
-                    candidates = []
-                    for offset in [1, 2, 3, 4, 5, 6, 7, 8]:
-                        candidate = correct_val + offset
-                        candidates.append(candidate)
-                    # Also add some below (but keep non-negative)
-                    for offset in [1, 2, 3]:
-                        candidate = correct_val - offset
-                        if candidate >= 0:
-                            candidates.append(candidate)
-                    possible_distractors.extend(candidates)
-                    possible_distractors = list(set(possible_distractors))
-                    # Remove correct answer and take first 3
-                    possible_distractors = [d for d in possible_distractors if d != correct_val][:3]
-                except (ValueError, AttributeError):
-                    # If we can't generate numeric distractors, use generic ones
-                    possible_distractors = [f"{int(correct_ans.split()[0]) + i}R{i}" for i in [1, 2, 3]]
+            possible_distractors = distractors.build_distractors(
+                skill_code=skill_code,
+                question=question_text,
+                correct_ans=correct_ans,
+                needed=3,
+            )
             
             # Create Question object
             question = Question(

@@ -3,6 +3,29 @@
 
 import random
 
+
+def _is_non_negative_option(value):
+    """Return True only for non-negative distractor candidates."""
+    if isinstance(value, int):
+        return value >= 0
+    if isinstance(value, str):
+        s = value.strip()
+        if not s:
+            return False
+        if "R" in s:
+            q, sep, r = s.partition("R")
+            if not sep:
+                return False
+            try:
+                return int(q) >= 0 and int(r) >= 0
+            except ValueError:
+                return False
+        try:
+            return int(s) >= 0
+        except ValueError:
+            return False
+    return False
+
 # extract terms from the question string.
 # also make sure that num1 > num2
 def get_terms(question, correct_ans):
@@ -254,4 +277,84 @@ def generate_distractors(skill_code, question, correct_ans):
         except Exception as e:
             print(f"Error generating distractors: {e}")
     
-    return list(all_distractors)
+    return [d for d in all_distractors if _is_non_negative_option(d)]
+
+
+def _build_non_negative_fallback_distractors(correct_ans, existing, needed=3):
+    """Fill distractors up to `needed` with guaranteed non-negative candidates."""
+    out = list(existing)
+
+    if isinstance(correct_ans, str) and "R" in correct_ans:
+        q, _, r = correct_ans.partition("R")
+        try:
+            qv = int(q)
+            rv = int(r)
+        except ValueError:
+            qv, rv = 0, 0
+
+        seed = [
+            f"{qv + 1}R{rv}",
+            f"{qv}R{rv + 1}",
+            f"{qv + 1}R{rv + 1}",
+            f"{qv + 2}R{rv}",
+            f"{qv}R{rv + 2}",
+        ]
+    else:
+        try:
+            base = int(correct_ans)
+        except (TypeError, ValueError):
+            base = 0
+
+        seed = [base + i for i in (1, 2, 3, 4, 5, 6)]
+
+    for candidate in seed:
+        if len(out) >= needed:
+            break
+        if candidate == correct_ans:
+            continue
+        if not _is_non_negative_option(candidate):
+            continue
+        if candidate in out:
+            continue
+        out.append(candidate)
+
+    return out
+
+
+def build_distractors(skill_code, question, correct_ans, needed=3):
+    """Return at least `needed` non-negative distractors for a question."""
+    try:
+        possible_distractors = generate_distractors(skill_code, question, correct_ans)
+    except Exception as e:
+        print(f"Error generating distractors for {skill_code}: {e}")
+        possible_distractors = []
+
+    possible_distractors = [
+        d for d in possible_distractors
+        if _is_non_negative_option(d)
+    ]
+
+    if len(possible_distractors) < needed:
+        # Preserve existing numeric fallback behavior.
+        try:
+            correct_val = int(correct_ans) if not isinstance(correct_ans, str) else int(correct_ans.split()[0])
+            candidates = []
+            for offset in [1, 2, 3, 4, 5, 6, 7, 8]:
+                candidates.append(correct_val + offset)
+            for offset in [1, 2, 3]:
+                candidate = correct_val - offset
+                if candidate >= 0:
+                    candidates.append(candidate)
+            possible_distractors.extend(candidates)
+            possible_distractors = list(set(possible_distractors))
+            possible_distractors = [d for d in possible_distractors if d != correct_val][:needed]
+        except (ValueError, AttributeError):
+            possible_distractors = []
+
+    possible_distractors = _build_non_negative_fallback_distractors(
+        correct_ans,
+        [d for d in possible_distractors if d != correct_ans],
+        needed=needed,
+    )
+
+    return possible_distractors
