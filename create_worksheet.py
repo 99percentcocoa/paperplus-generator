@@ -56,6 +56,7 @@ def create_worksheet(skill_distribution: dict = None, language: str = "en") -> l
         raise ValueError(f"Skill distribution must sum to 20, got {total}")
     
     worksheet = []
+    question_index = 1
     
     for skill_code, num_questions in skill_distribution.items():
         # Generate raw questions
@@ -76,6 +77,7 @@ def create_worksheet(skill_distribution: dict = None, language: str = "en") -> l
             
             # Create Question object
             question = Question(
+                index=question_index,
                 question_text=question_text,
                 skill_code=skill_code,
                 options=[correct_ans],  # Will be replaced by choose_distractors
@@ -93,6 +95,7 @@ def create_worksheet(skill_distribution: dict = None, language: str = "en") -> l
             question.correct_option = number_to_letter(question.answer)
             
             worksheet.append(question)
+            question_index += 1
     
     return worksheet
 
@@ -242,6 +245,7 @@ def worksheet_to_json(name: str, worksheet: list, level: str, language: str) -> 
         answer_letter = q.correct_option
         
         questions.append({
+            "index": q.index,
             "question_text": q.question_text,
             "skill_code": q.skill_code,
             "options": [str(opt) for opt in q.options],

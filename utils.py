@@ -143,6 +143,7 @@ def question_to_marathi(question: Question) -> Question:
     marathi_possible_distractors = [arabic_to_devanagari(str(opt)) for opt in question.possible_distractors]
 
     return Question(
+        index=question.index,
         question_text=marathi_question_text,
         skill_code=question.skill_code,
         options=marathi_options,

@@ -27,10 +27,11 @@ def _is_non_negative_option(value):
 @dataclass
 class Question:
     """Data class to track question information."""
+    index: int
     question_text: str
     skill_code: str
     options: list
-    answer: int  # 1-4 index indicating the correct answer position
+    answer: int # 1-based index of the correct answer in options, to be converted later
     possible_distractors: list
     correct_option: str = None # will be filled in choose_distractors
 
